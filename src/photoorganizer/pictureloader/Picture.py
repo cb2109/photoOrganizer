@@ -1,4 +1,5 @@
 import os
+import ntpath
 import platform
 from datetime import datetime
 from PIL import Image
@@ -31,6 +32,27 @@ class Picture(object):
                 except AttributeError:
                     return fromtimestamp(stat.st_mtime)
 
+    def write(self, path, file_name = None):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        
+        if not os.path.isdir(path):
+            raise "File exists at current directory location: %s" % path
+        
+        if file_name is None:
+            file_name = ntpath.basename(self.file_path)
+
+        full_path = os.path.join(path, file_name)
+        if os.path.exists(full_path):
+            raise "File exists: " + full_path
+        
+        self.file.save(full_path, self.file.format)
+
+
+
+
     def close(self):
         self.file.close()
 
+    def __repr__(self):
+        return "Picture: %s" % self.file_path

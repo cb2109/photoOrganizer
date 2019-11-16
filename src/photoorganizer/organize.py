@@ -22,17 +22,28 @@ def convert_to_pictures(paths: List[str]) -> List[Picture]:
 
 def organize_by_date(pictures: List[Picture]) -> Dict[str, Picture]:
     date_organizer = DateOrganizer()
-    date_organizer.organize(pictures)
+    organized_pictures = date_organizer.organize(pictures)
+    return organized_pictures
+
+def write_pictures(dir: str, pictures: Dict):
+    for folder_name in pictures.keys():
+        sub_path = os.path.join(dir, folder_name)
+        if isinstance(pictures[folder_name], list):
+            for picture in pictures[folder_name]:
+                picture.write(sub_path)
+        else:
+            write_pictures(sub_path, pictures[folder_name])
 
 
 if __name__== "__main__":
     start_dir = "C:\\Users\\Chris\\Pictures\\iCloud Photos\\Downloads\\2018\\"
+    output_dir = "C:\\Users\\Chris\\Documents\\My Projects\\photoOrganizer\\output"
     picture_paths = get_picture_paths(start_dir)
     pictures = []
     try:
         pictures = convert_to_pictures(picture_paths)
         date_organized_pictures = organize_by_date(pictures)
-
+        write_pictures(output_dir, date_organized_pictures)
     finally:
         for picture in pictures:
             picture.close()
