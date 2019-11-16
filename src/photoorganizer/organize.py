@@ -4,6 +4,18 @@ from pictureloader.Picture import Picture
 from dateorganizer.DateOrganizer import DateOrganizer
 import os
 
+def remove_output(path):
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            print("Deleting file: %s" % file_path)
+            os.remove(file_path)
+        for name in dirs:
+            dir_path = os.path.join(root, name)
+            print("Deleting dir: %s" % dir_path)
+            os.rmdir(dir_path)
+    os.rmdir(path)
+
 def get_picture_paths(path: str) -> List[str]:
     with os.scandir(path) as dir_entries:
         picture_paths = []
@@ -38,6 +50,8 @@ def write_pictures(dir: str, pictures: Dict):
 if __name__== "__main__":
     start_dir = "C:\\Users\\Chris\\Pictures\\iCloud Photos\\Downloads\\2018\\"
     output_dir = "C:\\Users\\Chris\\Documents\\My Projects\\photoOrganizer\\output"
+    if os.path.exists("..\\..\\output"):
+        remove_output("..\\..\\output")
     picture_paths = get_picture_paths(start_dir)
     pictures = []
     try:
