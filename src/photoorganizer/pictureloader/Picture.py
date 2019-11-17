@@ -25,7 +25,7 @@ class Picture(object):
             date = self.exif["DateTimeOriginal"]
             return datetime.strptime(date, self.exif_date_format)
         else:
-            logger.warn("No exif date for image: %s" % self.file_path)
+            logger.warning("No exif date for image: %s" % self.file_path)
             if platform.system() == 'Windows':
                 return datetime.fromtimestamp(os.path.getctime(self.file_path))
             else:
@@ -39,7 +39,7 @@ class Picture(object):
         if "GPSInfo" in self.exif.keys():
             return self.exif["GPSInfo"]
         else:
-            logger.warn("No exif location for image: %s" % self.file_path)
+            logger.warning("No exif location for image: %s" % self.file_path)
             return None
 
     def write(self, path, file_name = None):

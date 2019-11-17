@@ -34,7 +34,7 @@ class LocationOrganizer(object):
                 grouped_pictures[group] = []     
             grouped_pictures[group].append(picture)
             if group == "Unknown":
-                logger.warn("Unknown picture at %s: %s" % (coord, picture))
+                logger.warning("Unknown picture at %s: %s" % (coord, picture))
 
         return grouped_pictures
         
