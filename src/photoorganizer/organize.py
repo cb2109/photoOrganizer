@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 from typing import List, Dict
 from pictureloader.Picture import Picture
-from dateorganizer.DateOrganizer import DateOrganizer
+from organizers.DateOrganizer import DateOrganizer
+from organizers.LocationOrganizer import LocationOrganizer
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def remove_output(path):
     for root, dirs, files in os.walk(path, topdown=False):
         for name in files:
             file_path = os.path.join(root, name)
-            print("Deleting file: %s" % file_path)
+            logger.info("Deleting file: %s" % file_path)
             os.remove(file_path)
         for name in dirs:
             dir_path = os.path.join(root, name)
-            print("Deleting dir: %s" % dir_path)
+            logger.info("Deleting dir: %s" % dir_path)
             os.rmdir(dir_path)
     os.rmdir(path)
 
@@ -37,14 +41,21 @@ def organize_by_date(pictures: List[Picture]) -> Dict[str, Picture]:
     organized_pictures = date_organizer.organize(pictures)
     return organized_pictures
 
+def organize_by_location(pictures: Dict[str, Picture]) -> Dict[str, Dict[str, List[Picture]]]:
+    location_organizer = LocationOrganizer()
+    organized_pictures = {}
+    for folder in pictures.keys():
+        organized_pictures[folder] = location_organizer.organize(pictures[folder])
+    return organized_pictures
+
 def write_pictures(dir: str, pictures: Dict):
     for folder_name in pictures.keys():
         sub_path = os.path.join(dir, folder_name)
-        if isinstance(pictures[folder_name], list):
+        if isinstance(pictures[folder_name], Dict):
+            write_pictures(sub_path, pictures[folder_name])
+        else:
             for picture in pictures[folder_name]:
                 picture.write(sub_path)
-        else:
-            write_pictures(sub_path, pictures[folder_name])
 
 
 if __name__== "__main__":
@@ -57,7 +68,8 @@ if __name__== "__main__":
     try:
         pictures = convert_to_pictures(picture_paths)
         date_organized_pictures = organize_by_date(pictures)
-        write_pictures(output_dir, date_organized_pictures)
+        location_organized_pictures = organize_by_location(date_organized_pictures)
+        write_pictures(output_dir, location_organized_pictures)
     finally:
         for picture in pictures:
             picture.close()

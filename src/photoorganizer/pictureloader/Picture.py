@@ -1,9 +1,12 @@
 import os
 import ntpath
 import platform
+import logging
 from datetime import datetime
 from PIL import Image
 import PIL.ExifTags
+
+logger = logging.getLogger(__name__)
 
 class Picture(object):
 
@@ -17,12 +20,12 @@ class Picture(object):
             if k in PIL.ExifTags.TAGS
         }
 
-    def get_file_modified_time(self):
+    def get_datetime(self):
         if "DateTimeOriginal" in self.exif.keys():
             date = self.exif["DateTimeOriginal"]
             return datetime.strptime(date, self.exif_date_format)
         else:
-            print("No exif date for image: " + self.file_path)
+            logger.warn("No exif date for image: %s" % self.file_path)
             if platform.system() == 'Windows':
                 return datetime.fromtimestamp(os.path.getctime(self.file_path))
             else:
@@ -31,6 +34,13 @@ class Picture(object):
                     return fromtimestamp(stat.st_birthtime)
                 except AttributeError:
                     return fromtimestamp(stat.st_mtime)
+
+    def get_gps_info(self):
+        if "GPSInfo" in self.exif.keys():
+            return self.exif["GPSInfo"]
+        else:
+            logger.warn("No exif location for image: %s" % self.file_path)
+            return None
 
     def write(self, path, file_name = None):
         if not os.path.exists(path):

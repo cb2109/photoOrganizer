@@ -12,12 +12,12 @@ class DateOrganizer(object):
     def organize(self, picture_arr: List[Picture]) -> Dict[str, Picture]:
         date_to_picture = {}
         for picture in picture_arr:
-            date_modified = picture.get_file_modified_time()
-            date_str = self.extract_date_str(date_modified)
+            date_modified = picture.get_datetime()
+            date_str = self._extract_date_str(date_modified)
             if not (date_str in date_to_picture.keys()):
                 date_to_picture[date_str] = []
             date_to_picture[date_str].append(picture)
         return date_to_picture
 
-    def extract_date_str(self, date):
+    def _extract_date_str(self, date):
         return date.strftime(self.date_format)
