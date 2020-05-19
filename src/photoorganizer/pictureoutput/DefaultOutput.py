@@ -23,7 +23,8 @@ class DefaultOutput(object):
                     
     def _get_dir_name(self, picture: Picture) -> str:
         metadata = picture.metadata
-        if metadata.date is None or metadata.coord == Coord(None, None):
-            return None
-        else:
-            return metadata.date.strftime(self.date_format) + "_" + metadata.location
+        name = ""
+        date = metadata.date.strftime(self.date_format) if metadata.date is not None else "unknown"
+        location = metadata.location if metadata.coord is not Coord(None, None) else "unknown"
+        num_faces = str(metadata.num_faces) if metadata.num_faces is not None else "unknown"
+        return "%s_%s_%s" % (date, location, num_faces)

@@ -7,3 +7,4 @@ class Metadata(object):
         self.date = None
         self.coord = Coord(None, None)
         self.location = None
+        self.num_faces = None

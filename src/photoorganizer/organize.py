@@ -3,11 +3,12 @@ from typing import List, Dict
 from pictureloader.Picture import Picture
 from organizers.DateOrganizer import DateOrganizer
 from organizers.LocationOrganizer import LocationOrganizer
+from organizers.FaceOrganizer import FaceOrganizer
 from pictureoutput.DefaultOutput import DefaultOutput
 import os
 import logging
 
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def remove_output(path):
@@ -61,9 +62,15 @@ if __name__== "__main__":
     picture_paths = []
     for directory in dirs:
         picture_paths.extend(get_picture_paths(directory))
+        break
     
     date_organizer = DateOrganizer()
     location_organizer = LocationOrganizer()
+    face_organizer = FaceOrganizer(
+        os.path.abspath("haarcascade_frontalface_default.xml"),
+        os.path.abspath("deploy.prototxt"),
+        os.path.abspath("res10_300x300_ssd_iter_140000.caffemodel")
+    )
 
     pictures = []
     for picture_paths_batch in batch(picture_paths, 50):
@@ -71,7 +78,9 @@ if __name__== "__main__":
             pictures = convert_to_pictures(picture_paths_batch)
             
             output = DefaultOutput(output_dir)
-            organized_pictures = date_organizer.organize(location_organizer.organize(pictures))
+            organized_pictures = face_organizer.organize(
+                date_organizer.organize(
+                    location_organizer.organize(pictures)))
             output.write(organized_pictures)
         finally:
             for picture in pictures:

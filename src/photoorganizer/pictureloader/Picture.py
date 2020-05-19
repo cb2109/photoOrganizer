@@ -1,4 +1,5 @@
 import os
+import shutil 
 import ntpath
 import logging
 from PIL import Image, ImageFile
@@ -22,7 +23,6 @@ class Picture(object):
             }
         else:
             self.exif = None
-
         self.metadata = Metadata()
 
     def get_datetime(self):
@@ -59,7 +59,7 @@ class Picture(object):
         if os.path.exists(full_path):
             raise Exception("File exists: %s" % full_path)
         try:
-            self.file.save(full_path, self.file.format)
+            shutil.copyfile(self.file_path, full_path)
         except IOError as e:
             logger.error("Picture %s could not be saved %s" % (self, e))
 
